@@ -31,12 +31,12 @@ const register = async (req, res) => {
     const [existing] = await pool.query('SELECT id FROM students WHERE email = ?', [email]);
     if (existing.length) return res.status(400).json({ message: 'Email already registered' });
 
-    const [result] = await pool.query(
+    const result = await pool.query(
       'INSERT INTO students (name, email, password, department, year, advisor_id) VALUES (?, ?, ?, ?, ?, ?)',
       [name, email, hashedPassword, department, year, advisorId || null]
     );
 
-    const [rows] = await pool.query('SELECT id, name, email, department, year FROM students WHERE id = ?', [result.insertId]);
+    const [rows] = await pool.query('SELECT id, name, email, department, year FROM students WHERE id = ?', [result[0].insertId]);
     const user = rows[0];
 
     return res.status(201).json({
@@ -49,12 +49,12 @@ const register = async (req, res) => {
   const [existing] = await pool.query('SELECT id FROM faculty WHERE email = ?', [email]);
   if (existing.length) return res.status(400).json({ message: 'Email already registered' });
 
-  const [result] = await pool.query(
+  const result = await pool.query(
     'INSERT INTO faculty (name, email, password, department, role, employee_id) VALUES (?, ?, ?, ?, ?, ?)',
     [name, email, hashedPassword, department, role, employeeId]
   );
 
-  const [rows] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [result.insertId]);
+  const [rows] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [result[0].insertId]);
   const user = rows[0];
 
   return res.status(201).json({
