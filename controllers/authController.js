@@ -35,7 +35,10 @@ const register = async (req, res) => {
       'INSERT INTO students (name, email, password, department, year, advisor_id) VALUES (?, ?, ?, ?, ?, ?)',
       [name, email, hashedPassword, department, year, advisorId || null]
     );
-    const [[user]] = await pool.query('SELECT id, name, email, department, year FROM students WHERE id = ?', [result.insertId]);
+
+    const [rows] = await pool.query('SELECT id, name, email, department, year FROM students WHERE id = ?', [result.insertId]);
+    const user = rows[0];
+
     return res.status(201).json({
       message: 'Registration successful',
       token: generateToken(user.id, 'student'),
@@ -50,7 +53,10 @@ const register = async (req, res) => {
     'INSERT INTO faculty (name, email, password, department, role, employee_id) VALUES (?, ?, ?, ?, ?, ?)',
     [name, email, hashedPassword, department, role, employeeId]
   );
-  const [[user]] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [result.insertId]);
+
+  const [rows] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [result.insertId]);
+  const user = rows[0];
+
   return res.status(201).json({
     message: 'Registration successful',
     token: generateToken(user.id, user.role),
@@ -66,7 +72,9 @@ const login = async (req, res) => {
   }
 
   if (role === 'student') {
-    const [[user]] = await pool.query('SELECT * FROM students WHERE email = ?', [email]);
+    const [rows] = await pool.query('SELECT * FROM students WHERE email = ?', [email]);
+    const user = rows[0];
+
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     const match = await bcrypt.compare(password, user.password);
@@ -79,7 +87,9 @@ const login = async (req, res) => {
     });
   }
 
-  const [[user]] = await pool.query('SELECT * FROM faculty WHERE email = ? AND role = ?', [email, role]);
+  const [rows] = await pool.query('SELECT * FROM faculty WHERE email = ? AND role = ?', [email, role]);
+  const user = rows[0];
+
   if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
   const match = await bcrypt.compare(password, user.password);
@@ -96,12 +106,16 @@ const getMe = async (req, res) => {
   const { id, role } = req.user;
 
   if (role === 'student') {
-    const [[user]] = await pool.query('SELECT id, name, email, department, year, advisor_id FROM students WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id, name, email, department, year, advisor_id FROM students WHERE id = ?', [id]);
+    const user = rows[0];
+
     if (!user) return res.status(404).json({ message: 'User not found' });
     return res.json({ ...user, role: 'student' });
   }
 
-  const [[user]] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [id]);
+  const [rows] = await pool.query('SELECT id, name, email, department, role, employee_id FROM faculty WHERE id = ?', [id]);
+  const user = rows[0];
+
   if (!user) return res.status(404).json({ message: 'User not found' });
   return res.json(user);
 };
