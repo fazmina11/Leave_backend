@@ -1,6 +1,13 @@
 const mysql = require('mysql2');
 
+if (!process.env.MYSQL_URL) {
+  console.error('❌ MYSQL_URL environment variable is not set');
+  process.exit(1);
+}
+
 const url = new URL(process.env.MYSQL_URL);
+
+console.log('Connecting to DB host:', url.hostname);
 
 const db = mysql.createPool({
   host:     url.hostname,

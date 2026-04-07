@@ -4,23 +4,15 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-].filter(Boolean);
-
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
+  origin: [
+    'http://localhost:3000',
+    'https://leavebackend-production.up.railway.app',
+    /\.vercel\.app$/,
+    /\.netlify\.app$/,
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
