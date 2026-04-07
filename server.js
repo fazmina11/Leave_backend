@@ -4,13 +4,16 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'https://leave-management-system-teal.vercel.app',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://leavebackend-production.up.railway.app',
-    /\.vercel\.app$/,
-    /\.netlify\.app$/,
-  ],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
