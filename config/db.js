@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise'); 
+const mysql = require('mysql2'); 
 
 if (!process.env.MYSQL_URL) {
   console.error('❌ MYSQL_URL environment variable is not set');
