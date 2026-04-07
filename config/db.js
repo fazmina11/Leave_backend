@@ -1,4 +1,4 @@
-const mysql = require('mysql2'); 
+const mysql = require('mysql2/promise'); 
 
 if (!process.env.MYSQL_URL) {
   console.error('❌ MYSQL_URL environment variable is not set');
@@ -21,13 +21,13 @@ const db = mysql.createPool({
   ssl: { rejectUnauthorized: false }
 });
 
-db.getConnection((err, connection) => {
-  if (err) {
+db.getConnection()
+  .then((connection) => {
+    console.log('✅ MySQL connected successfully');
+    connection.release();
+  })
+  .catch((err) => {
     console.error('❌ MySQL connection error:', err.message);
-    return;
-  }
-  console.log('✅ MySQL connected successfully');
-  connection.release();
-});
+  });
 
 module.exports = db;
